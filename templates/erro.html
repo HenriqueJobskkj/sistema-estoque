@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block conteudo %}
+<h2 class="titulo-pagina">{{ titulo }}</h2>
+
+<div class="cartao">
+    <p class="texto-vazio">Erro {{ codigo }}. {{ mensagem }}</p>
+
+    <div class="botoes-form">
+        <a href="{{ url_for('index') }}" class="botao">🏠 Voltar ao dashboard</a>
+    </div>
+</div>
+{% endblock %}

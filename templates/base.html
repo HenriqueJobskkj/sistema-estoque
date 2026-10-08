@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Controle de Estoque{% endblock %}</title>
+
+    <!-- Ícone da aba do navegador (um emoji desenhado em SVG) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📦%3C/text%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Menu lateral (aparece em todas as páginas) -->
+    <aside class="menu-lateral">
+        <div class="logo">
+            <span class="logo-icone">📦</span>
+            <div>
+                <strong>Estoque</strong>
+                <small>Controle de produtos</small>
+            </div>
+        </div>
+
+        <nav>
+            <p class="menu-secao">Visão geral</p>
+            <a href="{{ url_for('index') }}"
+               class="{% if request.endpoint == 'index' %}ativo{% endif %}">🏠 Dashboard</a>
+
+            <p class="menu-secao">Produtos</p>
+            <a href="{{ url_for('produtos.listar') }}"
+               class="{% if request.endpoint in ('produtos.listar', 'produtos.detalhes', 'produtos.editar') %}ativo{% endif %}">📋 Produtos</a>
+            <a href="{{ url_for('produtos.novo') }}"
+               class="{% if request.endpoint == 'produtos.novo' %}ativo{% endif %}">➕ Novo produto</a>
+
+            <p class="menu-secao">Movimentações</p>
+            <a href="{{ url_for('movimentacoes.entrada') }}"
+               class="{% if request.endpoint == 'movimentacoes.entrada' %}ativo{% endif %}">⬇️ Entrada de estoque</a>
+            <a href="{{ url_for('movimentacoes.saida') }}"
+               class="{% if request.endpoint == 'movimentacoes.saida' %}ativo{% endif %}">⬆️ Saída de estoque</a>
+            <a href="{{ url_for('movimentacoes.historico') }}"
+               class="{% if request.endpoint == 'movimentacoes.historico' %}ativo{% endif %}">🕘 Histórico</a>
+
+            <p class="menu-secao">Análises</p>
+            <a href="{{ url_for('relatorios.index') }}"
+               class="{% if request.blueprint == 'relatorios' %}ativo{% endif %}">📊 Relatórios</a>
+        </nav>
+    </aside>
+
+    <!-- Área onde cada página coloca o seu conteúdo -->
+    <main class="conteudo">
+
+        <!-- Mensagens de sucesso e de erro -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="alerta alerta-{{ categoria }}">
+                    <span>{{ mensagem }}</span>
+                    <button type="button" class="alerta-fechar" aria-label="Fechar">&times;</button>
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        {% block conteudo %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- Espaço para scripts específicos de cada página (dashboard e relatórios) -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

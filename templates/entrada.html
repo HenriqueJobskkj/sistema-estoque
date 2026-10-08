@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block titulo %}Entrada de estoque{% endblock %}
+
+{% block conteudo %}
+<h2 class="titulo-pagina">Entrada de estoque</h2>
+
+<div class="cartao">
+    {% if produtos %}
+    <form method="POST" action="{{ url_for('movimentacoes.entrada') }}">
+
+        <div class="campo">
+            <label for="produto_id">Produto *</label>
+            <select id="produto_id" name="produto_id" required>
+                <option value="">Selecione um produto...</option>
+                {% for p in produtos %}
+                <option value="{{ p.id }}" data-estoque="{{ p.quantidade }}"
+                        {% if form.produto_id == p.id|string %}selected{% endif %}>
+                    {{ p.codigo }} - {{ p.nome }} (estoque atual: {{ p.quantidade }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="campo">
+            <label for="quantidade">Quantidade de entrada *</label>
+            <input type="number" id="quantidade" name="quantidade" min="1" step="1"
+                   value="{{ form.quantidade or '' }}" required>
+        </div>
+
+        <div class="campo">
+            <label for="observacao">Observação (opcional)</label>
+            <input type="text" id="observacao" name="observacao" maxlength="255"
+                   placeholder="Ex.: Compra de reposição"
+                   value="{{ form.observacao or '' }}">
+        </div>
+
+        <!-- Prévia preenchida pelo JavaScript -->
+        <p id="previa" class="previa"></p>
+
+        <div class="botoes-form">
+            <button type="submit" class="botao">Confirmar entrada</button>
+            <a href="{{ url_for('produtos.listar') }}" class="botao botao-cinza">Cancelar</a>
+        </div>
+    </form>
+    {% else %}
+        <p class="texto-vazio">
+            Nenhum produto cadastrado.
+            <a href="{{ url_for('produtos.novo') }}">Cadastre um produto</a>
+            antes de registrar entradas.
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

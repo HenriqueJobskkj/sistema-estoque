@@ -1,0 +1,26 @@
+# Configurações privadas (nunca enviar para o GitHub)
+.env
+
+# Ambiente virtual
+venv/
+.venv/
+env/
+
+# Arquivos temporários do Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Editores
+.vscode/
+.idea/
+
+# Arquivos do sistema operacional e do OneDrive
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logs e backups
+*.log
+*.bak

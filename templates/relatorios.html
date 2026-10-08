@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block titulo %}Relatórios{% endblock %}
+
+{% block conteudo %}
+<h2 class="titulo-pagina">Relatórios</h2>
+
+<!-- Filtro de período -->
+<div class="cartao cartao-largo">
+    <form method="GET" action="{{ url_for('relatorios.index') }}">
+        <div class="linha">
+            <div class="campo">
+                <label for="data_inicial">Data inicial</label>
+                <input type="date" id="data_inicial" name="data_inicial"
+                       value="{{ data_inicial.strftime('%Y-%m-%d') }}">
+            </div>
+
+            <div class="campo">
+                <label for="data_final">Data final</label>
+                <input type="date" id="data_final" name="data_final"
+                       value="{{ data_final.strftime('%Y-%m-%d') }}">
+            </div>
+        </div>
+
+        <div class="botoes-form">
+            <button type="submit" class="botao">🔍 Gerar relatório</button>
+            <a href="{{ url_for('relatorios.index') }}" class="botao botao-cinza">Últimos 30 dias</a>
+        </div>
+    </form>
+</div>
+
+<p class="contador" style="margin-top: 20px;">
+    Período analisado: {{ data_inicial.strftime('%d/%m/%Y') }} a {{ data_final.strftime('%d/%m/%Y') }}.
+    As entradas, as saídas e o gráfico por dia usam esse período.
+    Produtos cadastrados, estoque baixo e o gráfico por categoria mostram a situação atual.
+</p>
+
+<!-- Cards -->
+<div class="cartoes-resumo">
+
+    <div class="card-resumo card-azul">
+        <p class="card-rotulo">Produtos cadastrados</p>
+        <p class="card-numero">{{ resumo.total_produtos }}</p>
+        <p class="card-detalhe">situação atual</p>
+    </div>
+
+    <div class="card-resumo card-laranja">
+        <p class="card-rotulo">Estoque baixo</p>
+        <p class="card-numero">{{ resumo.estoque_baixo }}</p>
+        <p class="card-detalhe">produtos no mínimo ou abaixo</p>
+    </div>
+
+    <div class="card-resumo card-verde">
+        <p class="card-rotulo">Entradas realizadas</p>
+        <p class="card-numero">{{ resumo.entradas_unidades }}</p>
+        <p class="card-detalhe">unidades em {{ resumo.entradas_movimentacoes }} movimentação(ões)</p>
+    </div>
+
+    <div class="card-resumo card-vermelho">
+        <p class="card-rotulo">Saídas realizadas</p>
+        <p class="card-numero">{{ resumo.saidas_unidades }}</p>
+        <p class="card-detalhe">unidades em {{ resumo.saidas_movimentacoes }} movimentação(ões)</p>
+    </div>
+
+    <div class="card-resumo card-roxo">
+        <p class="card-rotulo">Movimentações no período</p>
+        <p class="card-numero">{{ resumo.entradas_movimentacoes + resumo.saidas_movimentacoes }}</p>
+        <p class="card-detalhe">entradas e saídas somadas</p>
+    </div>
+
+</div>
+
+<!-- Gráficos -->
+<div class="graficos">
+
+    <div class="cartao cartao-largo">
+        <h3 class="titulo-grafico">Movimentações por dia (unidades)</h3>
+        <div class="grafico-caixa">
+            <canvas id="grafico-dias"></canvas>
+        </div>
+    </div>
+
+    <div class="cartao cartao-largo">
+        <h3 class="titulo-grafico">Unidades em estoque por categoria</h3>
+        <div class="grafico-caixa">
+            <canvas id="grafico-categorias"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- Tabela 1: estoque baixo -->
+<div class="cabecalho-secao">
+    <h3 class="subtitulo">Produtos com estoque baixo</h3>
+    <a href="{{ url_for('relatorios.exportar_estoque_baixo') }}" class="botao botao-cinza botao-pequeno">⬇️ Exportar CSV</a>
+</div>
+
+<div class="cartao cartao-largo">
+    {% if produtos_baixo %}
+        <div class="tabela-container">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th class="numero">Quantidade</th>
+                        <th class="numero">Estoque mínimo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos_baixo %}
+                    <tr>
+                        <td>{{ p.codigo }}</td>
+                        <td>{{ p.nome }}</td>
+                        <td>{{ p.categoria }}</td>
+                        <td class="numero">{{ p.quantidade }}</td>
+                        <td class="numero">{{ p.estoque_minimo }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="texto-vazio">Nenhum produto com estoque baixo.</p>
+    {% endif %}
+</div>
+
+<!-- Tabela 2: movimentações do período -->
+<div class="cabecalho-secao">
+    <h3 class="subtitulo">Movimentações do período</h3>
+    <a href="{{ url_for('relatorios.exportar_movimentacoes', data_inicial=data_inicial.strftime('%Y-%m-%d'), data_final=data_final.strftime('%Y-%m-%d')) }}"
+       class="botao botao-cinza botao-pequeno">⬇️ Exportar CSV</a>
+</div>
+
+<div class="cartao cartao-largo">
+    {% if movimentacoes %}
+        <p class="contador">
+            {{ movimentacoes|length }} movimentação(ões) exibida(s)
+            {% if movimentacoes|length >= limite %}
+                (mostrando as {{ limite }} mais recentes; o CSV traz todas)
+            {% endif %}
+        </p>
+
+        <div class="tabela-container">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th class="numero">Quantidade</th>
+                        <th>Data</th>
+                        <th>Observação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in movimentacoes %}
+                    <tr>
+                        <td>{{ m.id }}</td>
+                        <td>{{ m.codigo }} - {{ m.produto }}</td>
+                        <td>
+                            {% if m.tipo == "ENTRADA" %}
+                                <span class="selo selo-entrada">ENTRADA</span>
+                            {% else %}
+                                <span class="selo selo-saida">SAÍDA</span>
+                            {% endif %}
+                        </td>
+                        <td class="numero">{{ m.quantidade }}</td>
+                        <td>{{ m.data_movimentacao.strftime("%d/%m/%Y %H:%M") }}</td>
+                        <td>{{ m.observacao or "-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="texto-vazio">Nenhuma movimentação no período.</p>
+    {% endif %}
+</div>
+
+<!-- Tabela 3: todos os produtos -->
+<div class="cabecalho-secao">
+    <h3 class="subtitulo">Produtos cadastrados</h3>
+    <a href="{{ url_for('relatorios.exportar_produtos') }}" class="botao botao-cinza botao-pequeno">⬇️ Exportar CSV</a>
+</div>
+
+<div class="cartao cartao-largo">
+    {% if produtos %}
+        <div class="tabela-container">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th class="numero">Preço</th>
+                        <th class="numero">Quantidade</th>
+                        <th class="numero">Estoque mínimo</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos %}
+                    <tr>
+                        <td>{{ p.codigo }}</td>
+                        <td>{{ p.nome }}</td>
+                        <td>{{ p.categoria }}</td>
+                        <td class="numero">R$ {{ "%.2f"|format(p.preco)|replace(".", ",") }}</td>
+                        <td class="numero">{{ p.quantidade }}</td>
+                        <td class="numero">{{ p.estoque_minimo }}</td>
+                        <td>
+                            {% if p.quantidade <= p.estoque_minimo %}
+                                <span class="selo selo-baixo">ESTOQUE BAIXO</span>
+                            {% else %}
+                                <span class="selo selo-normal">ESTOQUE NORMAL</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="texto-vazio">Nenhum produto cadastrado.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<!-- Biblioteca de gráficos Chart.js (carregada pela internet) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+    // Dados enviados pelo Flask (o filtro "tojson" converte para JavaScript)
+    var rotulosDias = {{ grafico_dias.rotulos|tojson }};
+    var entradasDias = {{ grafico_dias.entradas|tojson }};
+    var saidasDias = {{ grafico_dias.saidas|tojson }};
+    var nomesCategorias = {{ grafico_categorias.nomes|tojson }};
+    var unidadesCategorias = {{ grafico_categorias.unidades|tojson }};
+
+    // Gráfico 1: entradas e saídas por dia (barras lado a lado)
+    new Chart(document.getElementById("grafico-dias"), {
+        type: "bar",
+        data: {
+            labels: rotulosDias,
+            datasets: [
+                {
+                    label: "Entradas",
+                    data: entradasDias,
+                    backgroundColor: "#16a34a"
+                },
+                {
+                    label: "Saídas",
+                    data: saidasDias,
+                    backgroundColor: "#dc2626"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Gráfico 2: unidades por categoria (rosca)
+    var cores = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626",
+                 "#7c3aed", "#0891b2", "#db2777", "#65a30d"];
+
+    new Chart(document.getElementById("grafico-categorias"), {
+        type: "doughnut",
+        data: {
+            labels: nomesCategorias,
+            datasets: [{
+                data: unidadesCategorias,
+                // Repete as cores caso existam mais categorias do que cores
+                backgroundColor: nomesCategorias.map(function (nome, i) {
+                    return cores[i % cores.length];
+                })
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "bottom" } }
+        }
+    });
+</script>
+{% endblock %}

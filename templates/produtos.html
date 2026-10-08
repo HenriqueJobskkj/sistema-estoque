@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block titulo %}Produtos{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+    <h2 class="titulo-pagina">Produtos</h2>
+    <a href="{{ url_for('produtos.novo') }}" class="botao">➕ Novo produto</a>
+</div>
+
+<!-- Campo de pesquisa: envia o texto digitado pela URL (método GET) -->
+<form method="GET" action="{{ url_for('produtos.listar') }}" class="barra-busca">
+    <input type="text" name="busca" value="{{ busca }}"
+           placeholder="Pesquisar por código, nome ou categoria...">
+    <button type="submit" class="botao">🔍 Pesquisar</button>
+    {% if busca %}
+        <a href="{{ url_for('produtos.listar') }}" class="botao botao-cinza">Limpar</a>
+    {% endif %}
+</form>
+
+<div class="cartao cartao-largo">
+    {% if produtos %}
+        <p class="contador">{{ produtos|length }} produto(s) encontrado(s)</p>
+
+        <div class="tabela-container">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th class="numero">Preço</th>
+                        <th class="numero">Quantidade</th>
+                        <th class="numero">Estoque mínimo</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos %}
+                    <tr>
+                        <td>{{ p.codigo }}</td>
+                        <td>{{ p.nome }}</td>
+                        <td>{{ p.categoria }}</td>
+                        <td class="numero">R$ {{ "%.2f"|format(p.preco)|replace(".", ",") }}</td>
+                        <td class="numero">{{ p.quantidade }}</td>
+                        <td class="numero">{{ p.estoque_minimo }}</td>
+                        <td>
+                            {% if p.quantidade <= p.estoque_minimo %}
+                                <span class="selo selo-baixo">ESTOQUE BAIXO</span>
+                            {% else %}
+                                <span class="selo selo-normal">ESTOQUE NORMAL</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="acoes">
+                                <a href="{{ url_for('produtos.detalhes', produto_id=p.id) }}"
+                                   class="botao botao-cinza botao-pequeno">Ver detalhes</a>
+
+                                <a href="{{ url_for('produtos.editar', produto_id=p.id) }}"
+                                   class="botao botao-amarelo botao-pequeno">Editar</a>
+
+                                <!-- Excluir é um formulário POST (e não um link) para ser mais seguro -->
+                                <form method="POST"
+                                      action="{{ url_for('produtos.excluir', produto_id=p.id) }}"
+                                      class="form-inline form-excluir"
+                                      data-nome="{{ p.nome }}">
+                                    <button type="submit" class="botao botao-vermelho botao-pequeno">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="texto-vazio">Nenhum produto encontrado.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,609 @@
+/* =====================================================
+   Sistema de Controle de Estoque - estilos
+   ===================================================== */
+
+/* ---------- Variáveis (cores e medidas usadas no sistema todo) ---------- */
+:root {
+    --cor-fundo: #f1f5f9;
+    --cor-branco: #ffffff;
+    --cor-texto: #1e293b;
+    --cor-texto-suave: #64748b;
+    --cor-borda: #e2e8f0;
+
+    --cor-menu: #0f172a;
+    --cor-menu-hover: #1e293b;
+
+    --cor-primaria: #2563eb;
+    --cor-primaria-escura: #1d4ed8;
+    --cor-verde: #16a34a;
+    --cor-vermelho: #dc2626;
+    --cor-laranja: #f59e0b;
+    --cor-roxo: #7c3aed;
+
+    --raio: 12px;
+    --sombra: 0 1px 2px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+/* ---------- Base ---------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", system-ui, Arial, sans-serif;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+    display: flex;
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.4);
+    outline-offset: 2px;
+}
+
+/* ---------- Menu lateral ---------- */
+.menu-lateral {
+    width: 250px;
+    flex-shrink: 0;
+    background: var(--cor-menu);
+    color: #ffffff;
+    padding: 24px 14px;
+
+    /* Fica fixo na tela enquanto a página rola */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    align-self: flex-start;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 8px;
+    margin-bottom: 24px;
+}
+
+.logo-icone {
+    font-size: 30px;
+}
+
+.logo strong {
+    display: block;
+    font-size: 18px;
+}
+
+.logo small {
+    display: block;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.menu-secao {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    padding: 0 12px;
+    margin: 18px 0 6px 0;
+}
+
+.menu-lateral nav a {
+    display: block;
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.menu-lateral nav a:hover {
+    background: var(--cor-menu-hover);
+    color: #ffffff;
+}
+
+/* Página atual */
+.menu-lateral nav a.ativo {
+    background: var(--cor-primaria);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* ---------- Conteúdo ---------- */
+.conteudo {
+    flex: 1;
+    min-width: 0;
+    padding: 32px;
+}
+
+.cabecalho-pagina {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.titulo-pagina {
+    font-size: 26px;
+    margin-bottom: 24px;
+}
+
+.cabecalho-pagina .titulo-pagina {
+    margin-bottom: 0;
+}
+
+.subtitulo {
+    font-size: 18px;
+    margin: 28px 0 12px 0;
+}
+
+/* Título de seção com botão ao lado (usado nos relatórios) */
+.cabecalho-secao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 28px 0 12px 0;
+}
+
+.cabecalho-secao .subtitulo {
+    margin: 0;
+}
+
+.cartao {
+    background: var(--cor-branco);
+    border-radius: var(--raio);
+    padding: 24px;
+    box-shadow: var(--sombra);
+    max-width: 720px;
+}
+
+.cartao-largo {
+    max-width: none;
+}
+
+.texto-vazio {
+    text-align: center;
+    color: var(--cor-texto-suave);
+    padding: 24px 0;
+}
+
+.aviso-info {
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+/* ---------- Dashboard: cards ---------- */
+.cartoes-resumo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.card-resumo {
+    background: var(--cor-branco);
+    border-radius: var(--raio);
+    padding: 18px 20px;
+    box-shadow: var(--sombra);
+    border-left: 5px solid var(--cor-primaria);
+    transition: transform 0.15s;
+}
+
+.card-resumo:hover {
+    transform: translateY(-2px);
+}
+
+.card-rotulo {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--cor-texto-suave);
+    margin-bottom: 6px;
+}
+
+.card-numero {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.card-detalhe {
+    font-size: 13px;
+    color: var(--cor-texto-suave);
+    margin-top: 6px;
+}
+
+.card-azul {
+    border-left-color: var(--cor-primaria);
+}
+
+.card-roxo {
+    border-left-color: var(--cor-roxo);
+}
+
+.card-laranja {
+    border-left-color: var(--cor-laranja);
+}
+
+.card-verde {
+    border-left-color: var(--cor-verde);
+}
+
+.card-vermelho {
+    border-left-color: var(--cor-vermelho);
+}
+
+/* ---------- Dashboard: gráficos ---------- */
+.graficos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.titulo-grafico {
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.grafico-caixa {
+    position: relative;
+    height: 320px;
+}
+
+/* ---------- Formulários ---------- */
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.campo label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.campo input,
+.campo textarea,
+.campo select {
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--cor-texto);
+    background: var(--cor-branco);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.campo input:focus,
+.campo textarea:focus,
+.campo select:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.linha {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.botoes-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Prévia do novo estoque (preenchida pelo JavaScript) */
+.previa {
+    min-height: 22px;
+    margin-bottom: 18px;
+    font-weight: 600;
+    color: #1e40af;
+}
+
+/* ---------- Barra de pesquisa ---------- */
+.barra-busca {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.barra-busca input {
+    flex: 1;
+    min-width: 220px;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--cor-branco);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.barra-busca input:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ---------- Botões ---------- */
+.botao {
+    display: inline-block;
+    background: var(--cor-primaria);
+    color: #ffffff;
+    border: none;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+}
+
+.botao:hover {
+    background: var(--cor-primaria-escura);
+}
+
+.botao:active {
+    transform: scale(0.98);
+}
+
+.botao:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.botao-cinza {
+    background: #64748b;
+}
+
+.botao-cinza:hover {
+    background: #475569;
+}
+
+.botao-amarelo {
+    background: var(--cor-laranja);
+}
+
+.botao-amarelo:hover {
+    background: #d97706;
+}
+
+.botao-vermelho {
+    background: var(--cor-vermelho);
+}
+
+.botao-vermelho:hover {
+    background: #b91c1c;
+}
+
+.botao-pequeno {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* Botões da última coluna da tabela */
+.acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.form-inline {
+    display: inline;
+}
+
+/* ---------- Tabelas ---------- */
+.tabela-container {
+    overflow-x: auto;
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.tabela th {
+    text-align: left;
+    background: #f8fafc;
+    padding: 12px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cor-texto-suave);
+    border-bottom: 2px solid var(--cor-borda);
+    white-space: nowrap;
+}
+
+.tabela td {
+    padding: 12px;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.tabela tbody tr:hover td {
+    background: #f8fafc;
+}
+
+.tabela .numero {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.contador {
+    color: var(--cor-texto-suave);
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+/* ---------- Selos de status ---------- */
+.selo {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.selo-normal,
+.selo-entrada {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.selo-baixo,
+.selo-saida {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ---------- Detalhes do produto ---------- */
+.detalhes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.detalhe-rotulo {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--cor-texto-suave);
+    margin-bottom: 4px;
+}
+
+.detalhe-valor {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.detalhe-largo {
+    grid-column: 1 / -1;
+}
+
+/* ---------- Alertas ---------- */
+.alerta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    max-width: 720px;
+    transition: opacity 0.3s;
+}
+
+.alerta a {
+    color: inherit;
+    font-weight: 600;
+}
+
+.alerta-saindo {
+    opacity: 0;
+}
+
+.alerta-fechar {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.alerta-fechar:hover {
+    opacity: 1;
+}
+
+.alerta-sucesso {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+}
+
+.alerta-erro {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.alerta-aviso {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    /* O menu vira uma barra no topo, com os links lado a lado (rolando para o lado) */
+    .menu-lateral {
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 12px;
+    }
+
+    .logo {
+        margin-bottom: 10px;
+    }
+
+    .menu-lateral nav {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .menu-lateral nav a {
+        white-space: nowrap;
+        margin-bottom: 0;
+    }
+
+    .menu-secao {
+        display: none;
+    }
+
+    .conteudo {
+        padding: 16px;
+    }
+
+    .graficos {
+        grid-template-columns: 1fr;
+    }
+
+    .card-numero {
+        font-size: 28px;
+    }
+}

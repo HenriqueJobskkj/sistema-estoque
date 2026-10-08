@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if editando %}Editar produto{% else %}Novo produto{% endif %}{% endblock %}
+
+{% block conteudo %}
+<h2 class="titulo-pagina">{% if editando %}Editar produto{% else %}Novo produto{% endif %}</h2>
+
+<div class="cartao">
+    <form method="POST"
+          action="{% if editando %}{{ url_for('produtos.editar', produto_id=produto_id) }}{% else %}{{ url_for('produtos.novo') }}{% endif %}">
+
+        <div class="linha">
+            <div class="campo">
+                <label for="codigo">Código *</label>
+                <input type="text" id="codigo" name="codigo" maxlength="30"
+                       value="{{ produto.codigo or '' }}" required>
+            </div>
+
+            <div class="campo">
+                <label for="categoria">Categoria *</label>
+                <input type="text" id="categoria" name="categoria" maxlength="50"
+                       value="{{ produto.categoria or '' }}" required>
+            </div>
+        </div>
+
+        <div class="campo">
+            <label for="nome">Nome *</label>
+            <input type="text" id="nome" name="nome" maxlength="100"
+                   value="{{ produto.nome or '' }}" required>
+        </div>
+
+        <div class="campo">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" rows="3"
+                      maxlength="500">{{ produto.descricao or '' }}</textarea>
+        </div>
+
+        <div class="linha">
+            <div class="campo">
+                <label for="preco">Preço (R$) *</label>
+                <input type="number" id="preco" name="preco" min="0" step="0.01"
+                       value="{{ produto.preco if produto.preco is not none else '' }}" required>
+            </div>
+
+            {% if not editando %}
+            <div class="campo">
+                <label for="quantidade">Quantidade inicial *</label>
+                <input type="number" id="quantidade" name="quantidade" min="0" step="1"
+                       value="{{ produto.quantidade if produto.quantidade is not none else '' }}" required>
+            </div>
+            {% endif %}
+
+            <div class="campo">
+                <label for="estoque_minimo">Estoque mínimo *</label>
+                <input type="number" id="estoque_minimo" name="estoque_minimo" min="0" step="1"
+                       value="{{ produto.estoque_minimo if produto.estoque_minimo is not none else '' }}" required>
+            </div>
+        </div>
+
+        {% if editando %}
+        <p class="aviso-info">
+            A quantidade em estoque não é alterada aqui. Use as telas de entrada e saída
+            para que cada mudança fique registrada no histórico.
+        </p>
+        {% endif %}
+
+        <div class="botoes-form">
+            <button type="submit" class="botao">
+                {% if editando %}Salvar alterações{% else %}Salvar produto{% endif %}
+            </button>
+            <a href="{{ url_for('produtos.listar') }}" class="botao botao-cinza">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

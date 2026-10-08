@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ produto.nome }}{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+    <h2 class="titulo-pagina">{{ produto.nome }}</h2>
+    <div class="botoes-form">
+        <a href="{{ url_for('produtos.editar', produto_id=produto.id) }}" class="botao botao-amarelo">Editar</a>
+        <a href="{{ url_for('produtos.listar') }}" class="botao botao-cinza">Voltar</a>
+    </div>
+</div>
+
+<div class="cartao cartao-largo">
+    <div class="detalhes">
+        <div>
+            <p class="detalhe-rotulo">Código</p>
+            <p class="detalhe-valor">{{ produto.codigo }}</p>
+        </div>
+
+        <div>
+            <p class="detalhe-rotulo">Categoria</p>
+            <p class="detalhe-valor">{{ produto.categoria }}</p>
+        </div>
+
+        <div>
+            <p class="detalhe-rotulo">Preço</p>
+            <p class="detalhe-valor">R$ {{ "%.2f"|format(produto.preco)|replace(".", ",") }}</p>
+        </div>
+
+        <div>
+            <p class="detalhe-rotulo">Quantidade em estoque</p>
+            <p class="detalhe-valor">{{ produto.quantidade }}</p>
+        </div>
+
+        <div>
+            <p class="detalhe-rotulo">Estoque mínimo</p>
+            <p class="detalhe-valor">{{ produto.estoque_minimo }}</p>
+        </div>
+
+        <div>
+            <p class="detalhe-rotulo">Status</p>
+            {% if produto.quantidade <= produto.estoque_minimo %}
+                <span class="selo selo-baixo">ESTOQUE BAIXO</span>
+            {% else %}
+                <span class="selo selo-normal">ESTOQUE NORMAL</span>
+            {% endif %}
+        </div>
+
+        <div>
+            <p class="detalhe-rotulo">Data de cadastro</p>
+            <p class="detalhe-valor">{{ produto.data_cadastro.strftime("%d/%m/%Y %H:%M") }}</p>
+        </div>
+
+        <div class="detalhe-largo">
+            <p class="detalhe-rotulo">Descrição</p>
+            <p>{{ produto.descricao or "Sem descrição." }}</p>
+        </div>
+    </div>
+</div>
+
+<h3 class="subtitulo">Últimas movimentações</h3>
+
+<div class="cartao cartao-largo">
+    {% if movimentacoes %}
+        <div class="tabela-container">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th class="numero">Quantidade</th>
+                        <th>Observação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in movimentacoes %}
+                    <tr>
+                        <td>{{ m.data_movimentacao.strftime("%d/%m/%Y %H:%M") }}</td>
+                        <td>
+                            {% if m.tipo == "ENTRADA" %}
+                                <span class="selo selo-entrada">ENTRADA</span>
+                            {% else %}
+                                <span class="selo selo-saida">SAÍDA</span>
+                            {% endif %}
+                        </td>
+                        <td class="numero">{{ m.quantidade }}</td>
+                        <td>{{ m.observacao or "-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="texto-vazio">Nenhuma movimentação registrada para este produto.</p>
+    {% endif %}
+</div>
+{% endblock %}

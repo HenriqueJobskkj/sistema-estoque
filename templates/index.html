@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block titulo %}Dashboard{% endblock %}
+
+{% block conteudo %}
+<div class="cabecalho-pagina">
+    <h2 class="titulo-pagina">Dashboard</h2>
+    <div class="botoes-form">
+        <a href="{{ url_for('movimentacoes.entrada') }}" class="botao">⬇️ Nova entrada</a>
+        <a href="{{ url_for('movimentacoes.saida') }}" class="botao botao-vermelho">⬆️ Nova saída</a>
+        <a href="{{ url_for('produtos.novo') }}" class="botao botao-cinza">➕ Novo produto</a>
+    </div>
+</div>
+
+<!-- Aviso: aparece só se existir algum produto com estoque baixo -->
+{% if resumo.estoque_baixo > 0 %}
+<div class="alerta alerta-aviso">
+    <span>
+        ⚠️ Atenção: {{ resumo.estoque_baixo }} produto(s) com estoque baixo.
+        <a href="{{ url_for('produtos.listar') }}">Ver produtos</a>
+    </span>
+</div>
+{% endif %}
+
+<!-- Cards com os números principais -->
+<div class="cartoes-resumo">
+
+    <div class="card-resumo card-azul">
+        <p class="card-rotulo">Total de produtos</p>
+        <p class="card-numero">{{ resumo.total_produtos }}</p>
+        <p class="card-detalhe">produtos cadastrados</p>
+    </div>
+
+    <div class="card-resumo card-roxo">
+        <p class="card-rotulo">Itens em estoque</p>
+        <p class="card-numero">{{ resumo.total_itens }}</p>
+        <p class="card-detalhe">unidades somando todos os produtos</p>
+    </div>
+
+    <div class="card-resumo card-laranja">
+        <p class="card-rotulo">Estoque baixo</p>
+        <p class="card-numero">{{ resumo.estoque_baixo }}</p>
+        <p class="card-detalhe">produtos no mínimo ou abaixo</p>
+    </div>
+
+    <div class="card-resumo card-verde">
+        <p class="card-rotulo">Total de entradas</p>
+        <p class="card-numero">{{ resumo.entradas_unidades }}</p>
+        <p class="card-detalhe">unidades em {{ resumo.entradas_movimentacoes }} movimentação(ões)</p>
+    </div>
+
+    <div class="card-resumo card-vermelho">
+        <p class="card-rotulo">Total de saídas</p>
+        <p class="card-numero">{{ resumo.saidas_unidades }}</p>
+        <p class="card-detalhe">unidades em {{ resumo.saidas_movimentacoes }} movimentação(ões)</p>
+    </div>
+
+</div>
+
+<!-- Gráficos -->
+<div class="graficos">
+
+    <div class="cartao cartao-largo">
+        <h3 class="titulo-grafico">Entradas x Saídas (unidades)</h3>
+        <div class="grafico-caixa">
+            <canvas id="grafico-movimentacoes"></canvas>
+        </div>
+    </div>
+
+    <div class="cartao cartao-largo">
+        <h3 class="titulo-grafico">Produtos com menor estoque</h3>
+        <div class="grafico-caixa">
+            <canvas id="grafico-menor-estoque"></canvas>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<!-- Biblioteca de gráficos Chart.js (carregada pela internet) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+    // Dados enviados pelo Flask. O filtro "tojson" converte para um formato
+    // que o JavaScript entende, com segurança.
+    var entradas = {{ resumo.entradas_unidades|tojson }};
+    var saidas = {{ resumo.saidas_unidades|tojson }};
+    var nomes = {{ menor_estoque.nomes|tojson }};
+    var quantidades = {{ menor_estoque.quantidades|tojson }};
+    var minimos = {{ menor_estoque.minimos|tojson }};
+
+    // Gráfico 1: Entradas x Saídas (barras verticais)
+    new Chart(document.getElementById("grafico-movimentacoes"), {
+        type: "bar",
+        data: {
+            labels: ["Entradas", "Saídas"],
+            datasets: [{
+                label: "Unidades",
+                data: [entradas, saidas],
+                backgroundColor: ["#16a34a", "#dc2626"]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Gráfico 2: Produtos com menor estoque (barras horizontais)
+    new Chart(document.getElementById("grafico-menor-estoque"), {
+        type: "bar",
+        data: {
+            labels: nomes,
+            datasets: [
+                {
+                    label: "Estoque atual",
+                    data: quantidades,
+                    backgroundColor: "#2563eb"
+                },
+                {
+                    label: "Estoque mínimo",
+                    data: minimos,
+                    backgroundColor: "#f59e0b"
+                }
+            ]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { x: { beginAtZero: true } }
+        }
+    });
+</script>
+{% endblock %}
